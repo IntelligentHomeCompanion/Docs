@@ -21,7 +21,7 @@ This general functional structure could look like so:
 
 ---
 
-Core : The core is the container of all sub services, in charge of starting up services, and reading the config. 
+Core : The core is the container of all sub services, in charge of starting up services, and beginning device/service discovery.
   
   .IPA : The IPA Service is the handoff point between the Core Service and many others. 
           The IPA (Intelligent Personal Assistant) receives appropriate requests and their data from Core, and hands it off to the next Parent Service.
@@ -58,7 +58,7 @@ Core : The core is the container of all sub services, in charge of starting up s
 
 With this core structure specified, heres a quick example of how a common interaction would go:
 
-API_Service receives a request via an endpoint. Seeing its text data, made to a command endpoint it knows somewhere the user said something. It is also passed some information about where this occured, 
+API_Service receives a request via an endpoint. Seeing its text data, made to a command endpoint it knows somewhere the user said something. It is also passed some information about where this occurred, 
   likely with parameters to identify the user, or include a DEVICE_ID of which device made the request. This DEVICE_ID should be the same as an ID accessible with .Device_Service.Devices.DEVICE_ID...
   The API_Service then can use `global.companion.ipa.consume()` passing all of this data. 
 Now when API Receives the data, with it, it can make some choices about how to handle it, but generally will then pass it along to its child via its own interface like `global.companion.ipa.dialog_manager` or even `this.dialog_manager`
