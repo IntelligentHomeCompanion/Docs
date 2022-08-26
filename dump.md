@@ -21,38 +21,20 @@ This general functional structure could look like so:
 
 ---
 
-Core : The core is the container of all sub services, in charge of starting up services, and beginning device/service discovery.
-  
-  .IPA : The IPA Service is the handoff point between the Core Service and many others. 
-          The IPA (Intelligent Personal Assistant) receives appropriate requests and their data from Core, and hands it off to the next Parent Service.
-          The IPA is also what does the responding to Core's requests, waiting for the appropriate actions to occur, then handing the resulting data off.
-    .Speech Manager Service : The first child or plugin service, is in charge of handling the auditory query data. It is expected to take this data, 
-                              And return usable text data.
-    .Dialog Manager : A child of IPA or plugin modal that is expected to maintain the session. This item is also able to depend on several Services itself
-                      It is able to rely on Services such as the .History Manager, which maintains session history, and historical Dialog Data.
-                      Or even use a .Knowledge Graph Service, which can help build knowledge trees or state data about the user their interacting with.
-                      But mainly the Dialog Manager is intended to be able to slot context into text data, additionally the Dialog Manager may rely on a separate parser such as an NLU, 
-                      to turn this speech into usable commands, or `intents`. A syntax needs to be created for these intents, but they are the expected output of this service.
-    .Provider Selection Service: Another plugin modal, or child of the IPA this is the service that takes in `intents` and routes them to the proper services/devices.
-                                  Ultimately this is the director of what to do with a command, whether that's to invoke a plugin to find the weather, or turn on the lights, 
-                                  The .Provider Selection Service must determine how to route the call, and invoke its desired service.
-    .Provides Service : A collection of plugin modals, all used by the .Provider Selection Service. While the .Provider Selection Service determines how to route a call, it will send it to a .Provides Service.
-                        Each .Provides Service should be specific in its task, intending to handle a single type of `intent` and find or complete the proper query, and return the status of that.
-                        These are intended to be the most common plugins created within an ecosystem like this, since each may look something like 'Provides Temperature', 'Turns on/off Phillips Lights', 'Chromecast Controller'
-                        and so on, for anything that can be thought of.
-  .Device Service : The Device Service is a Core Service that is in charge of storing devices found, and initializing the setup of said devices. 
-    .Devices : Another Core Service, that is the namespace for interacting with existing and setup devices.
-    .Device Provides Service : A collection of plugin modals, that each are specific in function, in returning a Devices object that allows interaction. Likely filling in functions of a predetermined pattern, to allow other services 
-                                to interact with said device, with zero knowledge on how it functions under the hood. We will utilize `traits` and `types` to allow this interaction to be as agnostic as possible. 
-                                For example: A Device with `type: light` and `traits` such as `turn_on`, and `turn_off` an .IPA.Provides Service would be able to, once it has the correct device, would be able to call a function such as 
-                                `global.companion.device_service.devices.DEVICE_ID.turnOn()` and expect that the device will turn on, no matter what the URL of this device is, or how the packet is structured to tell it to do so.
-  .Plugin Service : A Core Service that is the controller of loading, and starting any/all plugins installed on the system. As well as disabling/enabling of plugins already on the system.
-  .API Service : A Core Service, that should be decoupled from Core that manages the API server and its endpoints.
-    .API Extension Service : It may be a smart idea to allow and extension service, that extends the endpoints, and responses to these new endpoints, allowing something like a WebService that hosts and controls a webpage, or 
-                              Just additional JSON endpoints for interacting with the service.
-                              Really if this route where to be chosen, it may be smart to include the expected endpoints as an API Extension Service, to expand customizability.
-  .Config Service : A Core Service tasked with finding, reading and initializing the configuration. Likely supporting a way to get a single configuration out to each plugin. Likely via name.
-  .Repository Service : A Core Service tasked with the finding, and installation of all plugins that are available. 
+- Core : The core is the container of all sub services, in charge of starting up services, and beginning device/service discovery.
+  - .IPA : The IPA Service is the handoff point between the Core Service and many others. The IPA (Intelligent Personal Assistant) receives appropriate requests and their data from Core, and hands it off to the next Parent Service. The IPA is also what does the responding to Core's requests, waiting for the appropriate actions to occur, then handing the resulting data off.
+    - .Speech Manager Service : The first child or plugin service, is in charge of handling the auditory query data. It is expected to take this data, and return usable text data.
+    - .Dialog Manager : A child of IPA or plugin modal that is expected to maintain the session. This item is also able to depend on several Services itself. It is able to rely on Services such as the .History Manager, which maintains session history, and historical Dialog Data. Or even use a .Knowledge Graph Service, which can help build knowledge trees or state data about the user their interacting with. But mainly the Dialog Manager is intended to be able to slot context into text data, additionally the Dialog Manager may rely on a separate parser such as an NLU, to turn this speech into usable commands, or `intents`. A syntax needs to be created for these intents, but they are the expected output of this service.
+    - .Provider Selection Service: Another plugin modal, or child of the IPA this is the service that takes in `intents` and routes them to the proper services/devices. Ultimately this is the director of what to do with a command, whether that's to invoke a plugin to find the weather, or turn on the lights, the .Provider Selection Service must determine how to route the call, and invoke its desired service.
+    - .Provides Service : A collection of plugin modals, all used by the .Provider Selection Service. While the .Provider Selection Service determines how to route a call, it will send it to a .Provides Service. Each .Provides Service should be specific in its task, intending to handle a single type of `intent` and find or complete the proper query, and return the status of that. These are intended to be the most common plugins created within an ecosystem like this, since each may look something like 'Provides Temperature', 'Turns on/off Phillips Lights', 'Chromecast Controller' and so on, for anything that can be thought of.
+  - .Device Service : The Device Service is a Core Service that is in charge of storing devices found, and initializing the setup of said devices. 
+    - .Devices : Another Core Service, that is the namespace for interacting with existing and setup devices.
+    - .Device Provides Service : A collection of plugin modals, that each are specific in function, in returning a Devices object that allows interaction. Likely filling in functions of a predetermined pattern, to allow other services to interact with said device, with zero knowledge on how it functions under the hood. We will utilize `traits` and `types` to allow this interaction to be as agnostic as possible. For example: A Device with `type: light` and `traits` such as `turn_on`, and `turn_off` an .IPA.Provides Service would be able to, once it has the correct device, would be able to call a function such as `global.companion.device_service.devices.DEVICE_ID.turnOn()` and expect that the device will turn on, no matter what the URL of this device is, or how the packet is structured to tell it to do so.
+  - .Plugin Service : A Core Service that is the controller of loading, and starting any/all plugins installed on the system. As well as disabling/enabling of plugins already on the system.
+  - .API Service : A Core Service, that should be decoupled from Core that manages the API server and its endpoints.
+    - .API Extension Service : It may be a smart idea to allow and extension service, that extends the endpoints, and responses to these new endpoints, allowing something like a WebService that hosts and controls a webpage, or Just additional JSON endpoints for interacting with the service. Really if this route where to be chosen, it may be smart to include the expected endpoints as an API Extension Service, to expand customizability.
+  - .Config Service : A Core Service tasked with finding, reading and initializing the configuration. Likely supporting a way to get a single configuration out to each plugin. Likely via name.
+  - .Repository Service : A Core Service tasked with the finding, and installation of all plugins that are available. 
 
 ---
 
